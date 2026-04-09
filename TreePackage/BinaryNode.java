@@ -1,0 +1,266 @@
+package TreePackage;
+
+/**
+ * An implementation of the ADT Binary Node.
+ * 
+ */
+class BinaryNode<T> {
+
+    private T data;
+    private BinaryNode<T> leftChild;
+    private BinaryNode<T> rightChild;
+    // ADD PRIVATE VARIABLEs TO HOLD A PRARENT REFERENCE
+    private BinaryNode<T> parent;
+    // AND A THREAD REFERENCE HERE
+    private BinaryNode<T> thread;
+
+    public BinaryNode() {
+        this(null); // Call next constructor
+    } // end default constructor
+
+    public BinaryNode(T dataPortion) {
+        this(dataPortion, null, null); // Call next constructor
+
+    } // end constructor
+
+    public BinaryNode(T dataPortion, BinaryNode<T> newLeftChild,
+            BinaryNode<T> newRightChild) {
+        // MODIFY THIS CONSTRUCTOR
+        data = dataPortion;
+        leftChild = newLeftChild;
+        rightChild = newRightChild;
+        parent = null;
+        thread = null;
+    } // end constructor
+
+    // ADD TWO MORE CONSTRUCTORS
+
+    public BinaryNode(T dataPortion, BinaryNode<T> leftChild,
+            BinaryNode<T> rightChild, BinaryNode<T> parentNode) {
+        this(dataPortion, leftChild, rightChild, parentNode, null);
+    }
+
+    public BinaryNode(T dataPortion, BinaryNode<T> leftChild,
+            BinaryNode<T> rightChild, BinaryNode<T> parentNode,
+            BinaryNode<T> threadNode) {
+        data = dataPortion;
+        this.leftChild = leftChild;
+        this.rightChild = rightChild;
+        parent = parentNode;
+        thread = threadNode;
+    }
+
+    /**
+     * Retrieves the data portion of this node.
+     *
+     * @return The object in the data portion of the node.
+     */
+    public T getData() {
+        return data;
+    } // end getData
+
+    /**
+     * Sets the data portion of this node.
+     *
+     * @param newData The data object.
+     */
+    public void setData(T newData) {
+        data = newData;
+    } // end setData
+
+    /**
+     * Retrieves the left child of this node.
+     *
+     * @return The node that is this node's left child.
+     */
+    public BinaryNode<T> getLeftChild() {
+        return leftChild;
+    } // end getLeftChild
+
+    /**
+     * Sets this node's left child to a given node.
+     *
+     * @param newLeftChild A node that will be the left child.
+     */
+    public void setLeftChild(BinaryNode<T> newLeftChild) {
+        leftChild = newLeftChild;
+    } // end setLeftChild
+
+    /**
+     * Detects whether this node has a left child.
+     *
+     * @return True if the node has a left child.
+     */
+    public boolean hasLeftChild() {
+        return leftChild != null;
+    } // end hasLeftChild
+
+    /**
+     * Retrieves the right child of this node.
+     *
+     * @return The node that is this node's right child.
+     */
+    public BinaryNode<T> getRightChild() {
+        return rightChild;
+    } // end getRightChild
+
+    /**
+     * Sets this nodes's right child to a given node.
+     *
+     * @param newRightChild A node that will be the right child.
+     */
+    public void setRightChild(BinaryNode<T> newRightChild) {
+        rightChild = newRightChild;
+    } // end setRightChild
+
+    /**
+     * Detects whether this node has a right child.
+     *
+     * @return True if the node has a right child.
+     */
+    public boolean hasRightChild() {
+        return rightChild != null;
+    } // end hasRightChild
+
+    /**
+     * Detects whether this node is a leaf.
+     *
+     * @return True if the node is a leaf.
+     */
+    public boolean isLeaf() {
+        return (leftChild == null) && (rightChild == null);
+    } // end isLeaf
+
+    /**
+     * Computes the height of the subtree rooted at this node.
+     *
+     * @return The height of the subtree rooted at this node.
+     */
+    public int getHeight() {
+        return getHeight(this); // Call private getHeight
+    } // end getHeight
+
+    private int getHeight(BinaryNode<T> node) {
+        int height = 0;
+        if (node != null) {
+            height = 1 + Math.max(getHeight(node.getLeftChild()),
+                    getHeight(node.getRightChild()));
+        }
+        return height;
+    } // end getHeight
+
+    /**
+     * Counts the nodes in the subtree rooted at this node.
+     *
+     * @return The number of nodes in the subtree rooted at this node.
+     */
+    public int getNumberOfNodes() {
+        int leftNumber = 0;
+        int rightNumber = 0;
+
+        if (leftChild != null) {
+            leftNumber = leftChild.getNumberOfNodes();
+        }
+
+        if (rightChild != null) {
+            rightNumber = rightChild.getNumberOfNodes();
+        }
+
+        return 1 + leftNumber + rightNumber;
+    } // end getNumberOfNodes
+
+    /**
+     * Copies the subtree rooted at this node.
+     *
+     * @return The root of a copy of the subtree rooted at this node.
+     */
+    public BinaryNode<T> copy() {
+        BinaryNode<T> newRoot = new BinaryNode<T>(data);
+        newRoot.parent = null;
+
+        if (leftChild != null) {
+            newRoot.setLeftChild(leftChild.copy(newRoot));
+        }
+        if (rightChild != null) {
+            newRoot.setRightChild(rightChild.copy(newRoot));
+        }
+
+        newRoot.linkSubtreeThreadOut(newRoot);
+
+        BinaryNode<T> leftmost = newRoot.getLeftmostInSubtree();
+        if (leftmost != null) {
+            newRoot.thread = leftmost;
+        }
+
+        return newRoot;
+    } // end copy
+
+    // ADD IN ANOTHER COPY THAT TAKES A PARENT REFERENCE
+    public BinaryNode<T> copy(BinaryNode<T> parentNode) {
+        BinaryNode<T> newRoot = new BinaryNode<T>(data);
+        newRoot.parent = parentNode;
+
+        if (leftChild != null) {
+            newRoot.setLeftChild(leftChild.copy(newRoot));
+        }
+        if (rightChild != null) {
+            newRoot.setRightChild(rightChild.copy(newRoot));
+        }
+
+        newRoot.linkSubtreeThreadOut(newRoot);
+
+        BinaryNode<T> leftmost = newRoot.getLeftmostInSubtree();
+        if (leftmost != null) {
+            newRoot.thread = leftmost;
+        }
+
+        return newRoot;
+    }
+
+    // ADD IN ACCESSORS FOR THE PARENT REFERENCE
+    // AND THREAD REFERENCE
+    public BinaryNode<T> getParent() {
+        return parent;
+    }
+
+    public void setParent(BinaryNode<T> newParent) {
+        parent = newParent;
+    }
+
+    public boolean hasParent() {
+        return parent != null;
+    }
+
+    public BinaryNode<T> getThread() {
+        return thread;
+    }
+
+    public void setThread(BinaryNode<T> newThread) {
+        thread = newThread;
+    }
+
+    public boolean hasThread() {
+        return thread != null;
+    }
+
+    // helper methods (kept consistent with your edited version)
+    public void linkSubtreeThreadOut(BinaryNode<T> linkTo) {
+        if (hasLeftChild()) {
+            BinaryNode<T> rightmost = leftChild;
+            while (rightmost.hasRightChild()) {
+                rightmost = rightmost.getRightChild();
+            }
+            rightmost.setThread(linkTo);
+        }
+    }
+
+    public BinaryNode<T> getLeftmostInSubtree() {
+        if (!hasRightChild()) return null;
+        BinaryNode<T> leftmost = rightChild;
+        while (leftmost.hasLeftChild()) {
+            leftmost = leftmost.getLeftChild();
+        }
+        return leftmost;
+    }
+
+} // end BinaryNode
